@@ -1,5 +1,6 @@
 const { env } = require("../../config/env.js");
 const FakeAgentClient = require("./FakeAgentClient.js");
+const GeminiAgentClient = require("./GeminiAgentClient.js");
 
 let client;
 
@@ -10,6 +11,11 @@ function getAgentClient() {
 
   if (provider === "fake") {
     client = new FakeAgentClient();
+    return client;
+  }
+
+  if (provider === "gemini") {
+    client = new GeminiAgentClient({ apiKey: env.aiApiKey, model: env.aiModel });
     return client;
   }
 
