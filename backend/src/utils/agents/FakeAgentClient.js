@@ -26,10 +26,10 @@ class FakeAgentClient {
     return { category: "UNCLEAR", confidence: 0.4, reasoning: "No clear keyword match." };
   }
 
-  async draftReply({ category, message, context }) {
+  async draftReply({ category, message, context, reviewerNote }) {
     if (this.overrides.draftReply !== undefined) {
       return typeof this.overrides.draftReply === "function"
-        ? this.overrides.draftReply({ category, message, context })
+        ? this.overrides.draftReply({ category, message, context, reviewerNote })
         : this.overrides.draftReply;
     }
 
@@ -39,6 +39,7 @@ class FakeAgentClient {
       `Thanks for reaching out about: "${message}"\n\n` +
       `Category: ${category}\n` +
       `${context ? `Context: ${JSON.stringify(context)}\n\n` : "\n"}` +
+      `${reviewerNote ? `${reviewerNote}\n\n` : ""}` +
       `We'll follow up shortly.\n\nBest,\nSupport Team`;
 
     return { subject, body };

@@ -29,7 +29,7 @@ class GeminiAgentClient {
     return JSON.parse(response.text);
   }
 
-  async draftReply({ category, message, context }) {
+  async draftReply({ category, message, context, reviewerNote }) {
     const response = await this.client.models.generateContent({
       model: this.model,
       contents: [
@@ -37,6 +37,7 @@ class GeminiAgentClient {
         `Category: ${category}`,
         `Customer request: ${message}`,
         `Customer context: ${JSON.stringify(context)}`,
+        ...(reviewerNote ? [reviewerNote] : []),
       ].join("\n"),
       config: {
         responseMimeType: "application/json",
