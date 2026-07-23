@@ -41,6 +41,12 @@ AI_MODEL=
 tests — no API key needed. Set `AI_PROVIDER` to `gemini`, `claude`, or
 `openai` plus a real `AI_API_KEY` and `AI_MODEL` to use a real LLM.
 
+## Database SSL
+
+Set `DATABASE_SSL=true` when `DATABASE_URL` points to a hosted Postgres
+(Render, Supabase, Neon, etc.) that requires SSL. Leave it `false` for local
+development.
+
 ## Tests
 
 ```bash
