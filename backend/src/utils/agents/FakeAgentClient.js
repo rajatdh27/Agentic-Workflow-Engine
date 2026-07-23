@@ -33,13 +33,14 @@ class FakeAgentClient {
         : this.overrides.draftReply;
     }
 
+    const greetingName = context?.name || "there";
     const subject = `Re: Your ${category.toLowerCase()} request`;
     const body =
-      `Hi,\n\n` +
+      `Hi ${greetingName},\n\n` +
       `Thanks for reaching out about: "${message}"\n\n` +
       `Category: ${category}\n` +
       `${context ? `Context: ${JSON.stringify(context)}\n\n` : "\n"}` +
-      `${reviewerNote ? `${reviewerNote}\n\n` : ""}` +
+      `${reviewerNote ? `Note from reviewer: ${reviewerNote}\n\n` : ""}` +
       `We'll follow up shortly.\n\nBest,\nSupport Team`;
 
     return { subject, body };

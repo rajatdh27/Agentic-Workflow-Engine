@@ -37,8 +37,13 @@ class GeminiAgentClient {
         `Category: ${category}`,
         `Customer request: ${message}`,
         `Customer context: ${JSON.stringify(context)}`,
-        ...(reviewerNote ? [reviewerNote] : []),
-      ].join("\n"),
+        context?.name ? `Address the customer by name ("${context.name}") in the greeting.` : null,
+        reviewerNote
+          ? `A human reviewer looked at this and left this instruction: "${reviewerNote}". Incorporate this into the reply.`
+          : null,
+      ]
+        .filter(Boolean)
+        .join("\n"),
       config: {
         responseMimeType: "application/json",
         responseSchema: {
