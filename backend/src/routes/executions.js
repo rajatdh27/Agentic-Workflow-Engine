@@ -4,6 +4,7 @@ const executionsController = require("../controllers/executionsController.js");
 const router = Router();
 
 router.get("/customers", executionsController.listCustomers);
+router.get("/bug-tickets", executionsController.listBugTickets);
 router.post("/executions", executionsController.create);
 router.get("/executions", executionsController.list);
 router.get("/executions/:id", executionsController.getOne);

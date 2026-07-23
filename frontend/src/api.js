@@ -31,6 +31,10 @@ export function listCustomers() {
   return getJson("/api/customers");
 }
 
+export function listBugTickets() {
+  return getJson("/api/bug-tickets");
+}
+
 export function listExecutions() {
   return getJson("/api/executions");
 }

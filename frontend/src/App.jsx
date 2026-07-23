@@ -1,7 +1,15 @@
 import { useState, useEffect, useRef } from "react";
 import SubmitForm from "./components/SubmitForm.jsx";
 import ExecutionResult from "./components/ExecutionResult.jsx";
-import { submitRequest, retryStep, approveStep, listCustomers, listExecutions, getExecution } from "./api.js";
+import {
+  submitRequest,
+  retryStep,
+  approveStep,
+  listCustomers,
+  listExecutions,
+  listBugTickets,
+  getExecution,
+} from "./api.js";
 
 const TERMINAL_STATUSES = new Set(["COMPLETED", "FAILED", "REJECTED", "WAITING_FOR_APPROVAL"]);
 const POLL_INTERVAL_MS = 700;
@@ -13,6 +21,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [runs, setRuns] = useState([]);
+  const [bugTickets, setBugTickets] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const [result, setResult] = useState(null);
   const pollingRef = useRef(null);
@@ -37,6 +46,7 @@ function App() {
           stopPolling();
           setLoading(false);
           refreshRuns();
+          refreshBugTickets();
         }
       } catch (err) {
         stopPolling();
@@ -56,6 +66,12 @@ function App() {
       .catch((err) => setError(err.message));
   }
 
+  function refreshBugTickets() {
+    listBugTickets()
+      .then(setBugTickets)
+      .catch((err) => setError(err.message));
+  }
+
   useEffect(() => {
     listCustomers()
       .then((data) => {
@@ -67,6 +83,7 @@ function App() {
       .catch((err) => setError(err.message));
 
     refreshRuns();
+    refreshBugTickets();
   }, []);
 
   async function handleSubmit(e) {
@@ -164,6 +181,20 @@ function App() {
             ))}
           </ul>
         </div>
+
+        {bugTickets.length > 0 && (
+          <div className="bug-tickets">
+            <h2>Bug Tickets</h2>
+            <ul>
+              {bugTickets.map((ticket) => (
+                <li key={ticket.id}>
+                  <span className="ticket-id">{ticket.ticket_id}</span>
+                  <span className="ticket-title">{ticket.title}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </aside>
 
       <main className="main">

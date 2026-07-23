@@ -2,7 +2,10 @@ const { loadWorkflow } = require("../models/workflowModel.js");
 const executionModel = require("../models/executionModel.js");
 const stepExecutionModel = require("../models/stepExecutionModel.js");
 const { listLogsForStep, addLog } = require("../models/logModel.js");
-const { listCustomers: listCustomersModel } = require("../models/mockDataModel.js");
+const {
+  listCustomers: listCustomersModel,
+  listBugTickets: listBugTicketsModel,
+} = require("../models/mockDataModel.js");
 const { runWorkflow } = require("./engine/runWorkflow.js");
 const { NotFoundError, BadRequestError } = require("./errors.js");
 
@@ -93,9 +96,14 @@ async function listCustomers() {
   return listCustomersModel();
 }
 
+async function listBugTickets() {
+  return listBugTicketsModel();
+}
+
 module.exports.submitRequest = submitRequest;
 module.exports.getExecutionDetail = getExecutionDetail;
 module.exports.retryStep = retryStep;
 module.exports.approveStep = approveStep;
 module.exports.listExecutions = listExecutions;
 module.exports.listCustomers = listCustomers;
+module.exports.listBugTickets = listBugTickets;

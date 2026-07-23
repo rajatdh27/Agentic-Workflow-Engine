@@ -54,7 +54,15 @@ async function createBugTicketIdempotent({ idempotencyKey, executionId, title })
   return { record: raceRows[0], wasCreated: false };
 }
 
+async function listBugTickets() {
+  const { rows } = await pool.query(
+    "SELECT * FROM mock_bug_ticket ORDER BY created_at DESC"
+  );
+  return rows;
+}
+
 module.exports.getCustomerById = getCustomerById;
 module.exports.listCustomers = listCustomers;
 module.exports.getInvoiceByCustomerId = getInvoiceByCustomerId;
 module.exports.createBugTicketIdempotent = createBugTicketIdempotent;
+module.exports.listBugTickets = listBugTickets;

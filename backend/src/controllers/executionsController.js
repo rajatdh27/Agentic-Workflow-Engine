@@ -27,6 +27,15 @@ async function listCustomers(req, res, next) {
   }
 }
 
+async function listBugTickets(req, res, next) {
+  try {
+    const result = await workflowService.listBugTickets();
+    res.status(200).json(result);
+  } catch (err) {
+    next(err);
+  }
+}
+
 async function getOne(req, res, next) {
   try {
     const result = await workflowService.getExecutionDetail(req.params.id);
@@ -61,6 +70,7 @@ async function approve(req, res, next) {
 module.exports.create = create;
 module.exports.list = list;
 module.exports.listCustomers = listCustomers;
+module.exports.listBugTickets = listBugTickets;
 module.exports.getOne = getOne;
 module.exports.retry = retry;
 module.exports.approve = approve;
