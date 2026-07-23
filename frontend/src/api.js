@@ -1,5 +1,7 @@
-async function getJson(url) {
-  const response = await fetch(url);
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
+
+async function getJson(path) {
+  const response = await fetch(`${API_BASE_URL}${path}`);
   const data = await response.json();
 
   if (!response.ok) {
@@ -9,8 +11,8 @@ async function getJson(url) {
   return data;
 }
 
-async function postJson(url, body) {
-  const response = await fetch(url, {
+async function postJson(path, body) {
+  const response = await fetch(`${API_BASE_URL}${path}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
