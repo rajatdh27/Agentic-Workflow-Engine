@@ -8,10 +8,12 @@
     "test": "DATABASE_URL=postgresql://rajatthakur@localhost:5432/libra_agentic_workflow_test node --test --test-concurrency=1 tests/*.test.js"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.113.0",
     "@google/genai": "^2.13.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "openai": "^6.48.0",
     "pg": "^8.22.0"
   }
 }
