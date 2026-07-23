@@ -2,6 +2,7 @@ import { useState } from "react";
 
 function StepItem({ step, onRetry, onApprove }) {
   const [expanded, setExpanded] = useState(false);
+  const [note, setNote] = useState("");
 
   return (
     <div className="node-card">
@@ -43,17 +44,30 @@ function StepItem({ step, onRetry, onApprove }) {
           )}
 
           {step.status === "WAITING_FOR_APPROVAL" && (
-            <div className="approval-actions">
-              <button type="button" className="action-button" onClick={() => onApprove(step.name, "APPROVED")}>
-                Approve
-              </button>
-              <button
-                type="button"
-                className="action-button reject"
-                onClick={() => onApprove(step.name, "REJECTED")}
-              >
-                Reject
-              </button>
+            <div className="approval-form">
+              <textarea
+                className="approval-note"
+                placeholder="Optional note..."
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                rows={2}
+              />
+              <div className="approval-actions">
+                <button
+                  type="button"
+                  className="action-button"
+                  onClick={() => onApprove(step.name, "APPROVED", note)}
+                >
+                  Approve
+                </button>
+                <button
+                  type="button"
+                  className="action-button reject"
+                  onClick={() => onApprove(step.name, "REJECTED", note)}
+                >
+                  Reject
+                </button>
+              </div>
             </div>
           )}
         </div>

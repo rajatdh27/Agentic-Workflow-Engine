@@ -45,6 +45,6 @@ export function retryStep(executionId, stepName) {
   return postJson(`/api/executions/${executionId}/steps/${stepName}/retry`, {});
 }
 
-export function approveStep(executionId, stepName, decision) {
-  return postJson(`/api/executions/${executionId}/steps/${stepName}/approve`, { decision });
+export function approveStep(executionId, stepName, decision, note) {
+  return postJson(`/api/executions/${executionId}/steps/${stepName}/approve`, { decision, note });
 }

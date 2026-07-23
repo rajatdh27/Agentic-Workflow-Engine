@@ -62,6 +62,7 @@ function App() {
   }
 
   async function handleRetry(stepName) {
+    setLoading(true);
     setError(null);
 
     try {
@@ -70,18 +71,23 @@ function App() {
       refreshRuns();
     } catch (err) {
       setError(err.message);
+    } finally {
+      setLoading(false);
     }
   }
 
-  async function handleApprove(stepName, decision) {
+  async function handleApprove(stepName, decision, note) {
+    setLoading(true);
     setError(null);
 
     try {
-      const data = await approveStep(result.execution.id, stepName, decision);
+      const data = await approveStep(result.execution.id, stepName, decision, note);
       setResult(data);
       refreshRuns();
     } catch (err) {
       setError(err.message);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -119,6 +125,12 @@ function App() {
 
       <main className="main">
         {error && <div className="banner banner-error">{error}</div>}
+        {loading && (
+          <div className="banner banner-loading">
+            <span className="spinner" />
+            Processing...
+          </div>
+        )}
 
         {result ? (
           <ExecutionResult result={result} onRetry={handleRetry} onApprove={handleApprove} />
