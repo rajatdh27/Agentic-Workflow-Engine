@@ -11,6 +11,9 @@ function required(name) {
 const env = {
   port: Number(process.env.PORT || 4000),
   databaseUrl: required("DATABASE_URL"),
+  aiProvider: process.env.AI_PROVIDER || "",
+  aiApiKey: process.env.AI_API_KEY || "",
+  aiModel: process.env.AI_MODEL || "",
 };
 
 module.exports.env = env;
