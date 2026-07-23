@@ -1,6 +1,7 @@
 const { before, beforeEach, after, test } = require("node:test");
 const assert = require("node:assert/strict");
 const { resetDb } = require("./helpers/resetDb.js");
+const { waitForTerminal } = require("./helpers/waitForTerminal.js");
 const { setAgentClient } = require("../src/utils/agents/index.js");
 const FakeAgentClient = require("../src/utils/agents/FakeAgentClient.js");
 const { submitRequest, retryStep } = require("../src/services/workflowService.js");
@@ -14,10 +15,11 @@ beforeEach(() => resetDb());
 after(() => pool.end());
 
 test("createBugTicketIdempotent returns the same record on repeat calls", async () => {
-  const detail = await submitRequest({
+  const submitted = await submitRequest({
     customerId: "C101",
     message: "The app keeps crashing with an error",
   });
+  const detail = await waitForTerminal(submitted.execution.id);
   const executionId = detail.execution.id;
   const idempotencyKey = `${executionId}:manual-check`;
 
@@ -30,10 +32,11 @@ test("createBugTicketIdempotent returns the same record on repeat calls", async 
 });
 
 test("retrying create_bug after a forced failure returns the identical ticketId and doesn't duplicate the ticket row", async () => {
-  const detail = await submitRequest({
+  const submitted = await submitRequest({
     customerId: "C101",
     message: "The app keeps crashing with an error",
   });
+  const detail = await waitForTerminal(submitted.execution.id);
   assert.equal(detail.execution.status, "COMPLETED");
 
   const createBugStep = detail.steps.find((s) => s.name === "create_bug");
@@ -48,7 +51,8 @@ test("retrying create_bug after a forced failure returns the identical ticketId 
     "forced failure for test"
   );
 
-  const retried = await retryStep(detail.execution.id, "create_bug");
+  await retryStep(detail.execution.id, "create_bug");
+  const retried = await waitForTerminal(detail.execution.id);
   assert.equal(retried.execution.status, "COMPLETED");
 
   const retriedCreateBugStep = retried.steps.find((s) => s.name === "create_bug");

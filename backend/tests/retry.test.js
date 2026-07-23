@@ -1,6 +1,7 @@
 const { before, beforeEach, after, test } = require("node:test");
 const assert = require("node:assert/strict");
 const { resetDb } = require("./helpers/resetDb.js");
+const { waitForTerminal } = require("./helpers/waitForTerminal.js");
 const { setAgentClient } = require("../src/utils/agents/index.js");
 const FakeAgentClient = require("../src/utils/agents/FakeAgentClient.js");
 const { submitRequest, retryStep } = require("../src/services/workflowService.js");
@@ -12,10 +13,11 @@ beforeEach(() => resetDb());
 after(() => pool.end());
 
 test("unknown customer fails fetch_customer and the execution", async () => {
-  const detail = await submitRequest({
+  const submitted = await submitRequest({
     customerId: "no-such-customer",
     message: "The app keeps crashing with an error",
   });
+  const detail = await waitForTerminal(submitted.execution.id);
 
   assert.equal(detail.execution.status, "FAILED");
 
@@ -26,10 +28,11 @@ test("unknown customer fails fetch_customer and the execution", async () => {
 });
 
 test("retryStep rejects with BadRequestError for a step that isn't FAILED", async () => {
-  const detail = await submitRequest({
+  const submitted = await submitRequest({
     customerId: "no-such-customer",
     message: "The app keeps crashing with an error",
   });
+  const detail = await waitForTerminal(submitted.execution.id);
 
   await assert.rejects(
     () => retryStep(detail.execution.id, "classify_issue"),
@@ -38,10 +41,11 @@ test("retryStep rejects with BadRequestError for a step that isn't FAILED", asyn
 });
 
 test("retryStep succeeds once the underlying data is fixed", async () => {
-  const detail = await submitRequest({
+  const submitted = await submitRequest({
     customerId: "temp-customer",
     message: "The app keeps crashing with an error",
   });
+  const detail = await waitForTerminal(submitted.execution.id);
   assert.equal(detail.execution.status, "FAILED");
 
   await pool.query(
@@ -50,7 +54,8 @@ test("retryStep succeeds once the underlying data is fixed", async () => {
   );
 
   try {
-    const retried = await retryStep(detail.execution.id, "fetch_customer");
+    await retryStep(detail.execution.id, "fetch_customer");
+    const retried = await waitForTerminal(detail.execution.id);
     assert.equal(retried.execution.status, "COMPLETED");
     assert.ok(retried.steps.every((s) => s.status === "COMPLETED"));
   } finally {

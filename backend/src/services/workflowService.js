@@ -10,7 +10,7 @@ async function submitRequest(request) {
   const { workflow } = await loadWorkflow();
   const execution = await executionModel.createExecution(workflow.id, request);
 
-  await runWorkflow(execution.id);
+  runWorkflow(execution.id).catch((err) => console.error("runWorkflow failed:", err));
 
   return getExecutionDetail(execution.id);
 }
@@ -50,7 +50,9 @@ async function retryStep(executionId, stepName) {
     throw new BadRequestError(`Step "${stepName}" is not in a FAILED state and cannot be retried`);
   }
 
-  await runWorkflow(executionId, { startStepName: stepName });
+  runWorkflow(executionId, { startStepName: stepName }).catch((err) =>
+    console.error("runWorkflow failed:", err)
+  );
 
   return getExecutionDetail(executionId);
 }
@@ -76,7 +78,9 @@ async function approveStep(executionId, decision, note) {
   await addLog(stepExecution.id, "INFO", `human decision: ${decision}${note ? ` - ${note}` : ""}`);
 
   const nextStepName = stepRow.transitions?.[decision] ?? null;
-  await runWorkflow(executionId, { startStepName: nextStepName, incomingOutcome: decision });
+  runWorkflow(executionId, { startStepName: nextStepName, incomingOutcome: decision }).catch((err) =>
+    console.error("runWorkflow failed:", err)
+  );
 
   return getExecutionDetail(executionId);
 }

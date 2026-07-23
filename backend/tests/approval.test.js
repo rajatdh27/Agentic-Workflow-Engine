@@ -1,6 +1,7 @@
 const { before, beforeEach, after, test } = require("node:test");
 const assert = require("node:assert/strict");
 const { resetDb } = require("./helpers/resetDb.js");
+const { waitForTerminal } = require("./helpers/waitForTerminal.js");
 const { setAgentClient } = require("../src/utils/agents/index.js");
 const FakeAgentClient = require("../src/utils/agents/FakeAgentClient.js");
 const { submitRequest, approveStep } = require("../src/services/workflowService.js");
@@ -15,9 +16,11 @@ test("APPROVED decision completes the execution through final_response", async (
     customerId: "C101",
     message: "not sure what's going on with my account",
   });
-  assert.equal(submitted.execution.status, "WAITING_FOR_APPROVAL");
+  const detail = await waitForTerminal(submitted.execution.id);
+  assert.equal(detail.execution.status, "WAITING_FOR_APPROVAL");
 
-  const approved = await approveStep(submitted.execution.id, "APPROVED");
+  await approveStep(detail.execution.id, "APPROVED");
+  const approved = await waitForTerminal(detail.execution.id);
 
   assert.equal(approved.execution.status, "COMPLETED");
   const finalResponse = approved.steps.find((s) => s.name === "final_response");
@@ -30,9 +33,11 @@ test("REJECTED decision marks the execution REJECTED, final_response never runs"
     customerId: "C101",
     message: "not sure what's going on with my account",
   });
-  assert.equal(submitted.execution.status, "WAITING_FOR_APPROVAL");
+  const detail = await waitForTerminal(submitted.execution.id);
+  assert.equal(detail.execution.status, "WAITING_FOR_APPROVAL");
 
-  const rejected = await approveStep(submitted.execution.id, "REJECTED");
+  await approveStep(detail.execution.id, "REJECTED");
+  const rejected = await waitForTerminal(detail.execution.id);
 
   assert.equal(rejected.execution.status, "REJECTED");
   assert.ok(!rejected.steps.some((s) => s.name === "final_response"));

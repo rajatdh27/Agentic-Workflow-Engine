@@ -1,6 +1,7 @@
 const { before, beforeEach, after, test } = require("node:test");
 const assert = require("node:assert/strict");
 const { resetDb } = require("./helpers/resetDb.js");
+const { waitForTerminal } = require("./helpers/waitForTerminal.js");
 const { setAgentClient } = require("../src/utils/agents/index.js");
 const FakeAgentClient = require("../src/utils/agents/FakeAgentClient.js");
 const { submitRequest } = require("../src/services/workflowService.js");
@@ -18,7 +19,8 @@ test("an invalid category from the agent fails classify_issue and never reaches 
   );
 
   try {
-    const detail = await submitRequest({ customerId: "C101", message: "anything" });
+    const submitted = await submitRequest({ customerId: "C101", message: "anything" });
+    const detail = await waitForTerminal(submitted.execution.id);
 
     assert.equal(detail.execution.status, "FAILED");
 

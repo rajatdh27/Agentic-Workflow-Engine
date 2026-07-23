@@ -1,7 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import SubmitForm from "./components/SubmitForm.jsx";
 import ExecutionResult from "./components/ExecutionResult.jsx";
 import { submitRequest, retryStep, approveStep, listCustomers, listExecutions, getExecution } from "./api.js";
+
+const TERMINAL_STATUSES = new Set(["COMPLETED", "FAILED", "REJECTED", "WAITING_FOR_APPROVAL"]);
+const POLL_INTERVAL_MS = 700;
 
 function App() {
   const [customers, setCustomers] = useState([]);
@@ -12,6 +15,36 @@ function App() {
   const [runs, setRuns] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const [result, setResult] = useState(null);
+  const pollingRef = useRef(null);
+
+  function stopPolling() {
+    if (pollingRef.current) {
+      clearInterval(pollingRef.current);
+      pollingRef.current = null;
+    }
+  }
+
+  function pollUntilTerminal(executionId) {
+    stopPolling();
+    setLoading(true);
+
+    pollingRef.current = setInterval(async () => {
+      try {
+        const data = await getExecution(executionId);
+        setResult(data);
+
+        if (TERMINAL_STATUSES.has(data.execution.status)) {
+          stopPolling();
+          setLoading(false);
+          refreshRuns();
+        }
+      } catch (err) {
+        stopPolling();
+        setLoading(false);
+        setError(err.message);
+      }
+    }, POLL_INTERVAL_MS);
+  }
 
   function refreshRuns() {
     listExecutions()
@@ -34,6 +67,7 @@ function App() {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    stopPolling();
     setLoading(true);
     setError(null);
 
@@ -42,14 +76,16 @@ function App() {
       setResult(data);
       setSelectedId(data.execution.id);
       refreshRuns();
+      pollUntilTerminal(data.execution.id);
     } catch (err) {
       setError(err.message);
-    } finally {
       setLoading(false);
     }
   }
 
   async function handleSelectRun(id) {
+    stopPolling();
+    setLoading(false);
     setError(null);
 
     try {
@@ -62,6 +98,7 @@ function App() {
   }
 
   async function handleRetry(stepName) {
+    stopPolling();
     setLoading(true);
     setError(null);
 
@@ -69,14 +106,15 @@ function App() {
       const data = await retryStep(result.execution.id, stepName);
       setResult(data);
       refreshRuns();
+      pollUntilTerminal(data.execution.id);
     } catch (err) {
       setError(err.message);
-    } finally {
       setLoading(false);
     }
   }
 
   async function handleApprove(stepName, decision, note) {
+    stopPolling();
     setLoading(true);
     setError(null);
 
@@ -84,9 +122,9 @@ function App() {
       const data = await approveStep(result.execution.id, stepName, decision, note);
       setResult(data);
       refreshRuns();
+      pollUntilTerminal(data.execution.id);
     } catch (err) {
       setError(err.message);
-    } finally {
       setLoading(false);
     }
   }
