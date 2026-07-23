@@ -1,6 +1,13 @@
 // Deterministic stand-in for a real LLM provider — same classify/draftReply
 // contract every real adapter must also implement, so swapping providers
 // never touches any other file.
+
+const CATEGORY_MESSAGES = {
+  BUG: "We've logged this as a technical issue our team will look into.",
+  BILLING: "We've reviewed your billing question.",
+  UNCLEAR: "We wanted to follow up on your message.",
+};
+
 class FakeAgentClient {
   constructor(overrides = {}) {
     this.overrides = overrides;
@@ -34,14 +41,14 @@ class FakeAgentClient {
     }
 
     const greetingName = context?.name || "there";
+    const categoryLine = CATEGORY_MESSAGES[category] || CATEGORY_MESSAGES.UNCLEAR;
     const subject = `Re: Your ${category.toLowerCase()} request`;
     const body =
       `Hi ${greetingName},\n\n` +
-      `Thanks for reaching out about: "${message}"\n\n` +
-      `Category: ${category}\n` +
-      `${context ? `Context: ${JSON.stringify(context)}\n\n` : "\n"}` +
-      `${reviewerNote ? `Note from reviewer: ${reviewerNote}\n\n` : ""}` +
-      `We'll follow up shortly.\n\nBest,\nSupport Team`;
+      `Thanks for reaching out about "${message}".\n\n` +
+      `${categoryLine}\n\n` +
+      `${reviewerNote ? `Our team added: "${reviewerNote}".\n\n` : ""}` +
+      `Best,\nSupport Team`;
 
     return { subject, body };
   }
