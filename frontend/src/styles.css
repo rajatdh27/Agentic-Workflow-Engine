@@ -15,6 +15,7 @@ button { cursor: pointer; font-family: inherit; }
 .runs-list li:hover { background: #1a1d24; }
 .runs-list li.selected { border-color: #3b6fed; background: #14203f; }
 .run-id { font-family: ui-monospace, monospace; color: #a3a9b3; }
+.run-customer { color: #93c5fd; font-weight: 600; }
 .run-desc { color: #cfd3da; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
 .empty-state { color: #6b7280; font-size: 14px; }
 .banner { padding: 8px 12px; border-radius: 6px; background: #1a1d24; margin-bottom: 16px; font-size: 13px; }

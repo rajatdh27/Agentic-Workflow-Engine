@@ -46,6 +46,10 @@ function App() {
     }, POLL_INTERVAL_MS);
   }
 
+  function getCustomerName(customerId) {
+    return customers.find((c) => c.id === customerId)?.name || customerId;
+  }
+
   function refreshRuns() {
     listExecutions()
       .then(setRuns)
@@ -154,6 +158,7 @@ function App() {
               >
                 <span className="run-id">{run.id.slice(0, 8)}</span>
                 <span className={`badge badge-${run.status.toLowerCase()}`}>{run.status}</span>
+                <span className="run-customer">{getCustomerName(run.request?.customerId)}</span>
                 <span className="run-desc">{run.request?.message}</span>
               </li>
             ))}
