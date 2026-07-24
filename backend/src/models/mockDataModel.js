@@ -61,8 +61,4 @@ async function listBugTickets() {
   return rows;
 }
 
-module.exports.getCustomerById = getCustomerById;
-module.exports.listCustomers = listCustomers;
-module.exports.getInvoiceByCustomerId = getInvoiceByCustomerId;
-module.exports.createBugTicketIdempotent = createBugTicketIdempotent;
-module.exports.listBugTickets = listBugTickets;
+module.exports = { getCustomerById, listCustomers, getInvoiceByCustomerId, createBugTicketIdempotent, listBugTickets };

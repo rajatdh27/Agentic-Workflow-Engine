@@ -1,4 +1,4 @@
-const { executorRegistry } = require("./executorRegistry.js");
+const { executorRegistry } = require("./executors.js");
 const stepExecutionModel = require("../../models/stepExecutionModel.js");
 const { addLog } = require("../../models/logModel.js");
 

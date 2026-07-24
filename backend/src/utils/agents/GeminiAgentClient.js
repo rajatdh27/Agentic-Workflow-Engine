@@ -1,4 +1,5 @@
 const { GoogleGenAI, Type } = require("@google/genai");
+const { classifyPrompt, draftReplyPrompt } = require("./prompts.js");
 
 class GeminiAgentClient {
   constructor({ apiKey, model }) {
@@ -12,7 +13,7 @@ class GeminiAgentClient {
   async classify({ message }) {
     const response = await this.client.models.generateContent({
       model: this.model,
-      contents: `Classify this customer support request as "BUG", "BILLING", or "UNCLEAR".\n\nRequest: ${message}`,
+      contents: classifyPrompt(message),
       config: {
         responseMimeType: "application/json",
         responseSchema: {
@@ -32,18 +33,7 @@ class GeminiAgentClient {
   async draftReply({ category, message, context, reviewerNote }) {
     const response = await this.client.models.generateContent({
       model: this.model,
-      contents: [
-        "Draft a short, friendly customer support reply email.",
-        `Category: ${category}`,
-        `Customer request: ${message}`,
-        `Customer context: ${JSON.stringify(context)}`,
-        context?.name ? `Address the customer by name ("${context.name}") in the greeting.` : null,
-        reviewerNote
-          ? `A human reviewer looked at this and left this instruction: "${reviewerNote}". Incorporate this into the reply.`
-          : null,
-      ]
-        .filter(Boolean)
-        .join("\n"),
+      contents: draftReplyPrompt({ category, message, context, reviewerNote }),
       config: {
         responseMimeType: "application/json",
         responseSchema: {

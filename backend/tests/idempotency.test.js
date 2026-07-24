@@ -1,18 +1,14 @@
-const { before, beforeEach, after, test } = require("node:test");
+const { test } = require("node:test");
 const assert = require("node:assert/strict");
-const { resetDb } = require("./helpers/resetDb.js");
+const { setupWorkflowTests } = require("./helpers/setup.js");
 const { waitForTerminal } = require("./helpers/waitForTerminal.js");
-const { setAgentClient } = require("../src/utils/agents/index.js");
-const FakeAgentClient = require("../src/utils/agents/FakeAgentClient.js");
 const { submitRequest, retryStep } = require("../src/services/workflowService.js");
 const { createBugTicketIdempotent } = require("../src/models/mockDataModel.js");
 const { loadWorkflow } = require("../src/models/workflowModel.js");
 const stepExecutionModel = require("../src/models/stepExecutionModel.js");
 const { pool } = require("../src/db/pool.js");
 
-before(() => setAgentClient(new FakeAgentClient()));
-beforeEach(() => resetDb());
-after(() => pool.end());
+setupWorkflowTests();
 
 test("createBugTicketIdempotent returns the same record on repeat calls", async () => {
   const submitted = await submitRequest({

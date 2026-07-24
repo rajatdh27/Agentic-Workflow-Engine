@@ -44,7 +44,4 @@ async function listExecutions() {
   return rows;
 }
 
-module.exports.createExecution = createExecution;
-module.exports.getExecutionById = getExecutionById;
-module.exports.updateExecutionStatus = updateExecutionStatus;
-module.exports.listExecutions = listExecutions;
+module.exports = { createExecution, getExecutionById, updateExecutionStatus, listExecutions };

@@ -22,5 +22,4 @@ async function listLogsForStep(stepExecutionId) {
   return rows;
 }
 
-module.exports.addLog = addLog;
-module.exports.listLogsForStep = listLogsForStep;
+module.exports = { addLog, listLogsForStep };

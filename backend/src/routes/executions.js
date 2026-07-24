@@ -1,14 +1,14 @@
 const { Router } = require("express");
-const executionsController = require("../controllers/executionsController.js");
+const { create, list, listCustomers, listBugTickets, getOne, retry, approve } = require("../controllers/executionsController.js");
 
 const router = Router();
 
-router.get("/customers", executionsController.listCustomers);
-router.get("/bug-tickets", executionsController.listBugTickets);
-router.post("/executions", executionsController.create);
-router.get("/executions", executionsController.list);
-router.get("/executions/:id", executionsController.getOne);
-router.post("/executions/:id/steps/:stepName/retry", executionsController.retry);
-router.post("/executions/:id/steps/:stepName/approve", executionsController.approve);
+router.get("/customers", listCustomers);
+router.get("/bug-tickets", listBugTickets);
+router.post("/executions", create);
+router.get("/executions", list);
+router.get("/executions/:id", getOne);
+router.post("/executions/:id/steps/:stepName/retry", retry);
+router.post("/executions/:id/steps/:stepName/approve", approve);
 
 module.exports = router;

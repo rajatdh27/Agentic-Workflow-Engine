@@ -1,16 +1,12 @@
-const { before, beforeEach, after, test } = require("node:test");
+const { test } = require("node:test");
 const assert = require("node:assert/strict");
-const { resetDb } = require("./helpers/resetDb.js");
+const { setupWorkflowTests } = require("./helpers/setup.js");
 const { waitForTerminal } = require("./helpers/waitForTerminal.js");
-const { setAgentClient } = require("../src/utils/agents/index.js");
-const FakeAgentClient = require("../src/utils/agents/FakeAgentClient.js");
 const { submitRequest, retryStep } = require("../src/services/workflowService.js");
 const { BadRequestError } = require("../src/services/errors.js");
 const { pool } = require("../src/db/pool.js");
 
-before(() => setAgentClient(new FakeAgentClient()));
-beforeEach(() => resetDb());
-after(() => pool.end());
+setupWorkflowTests();
 
 test("unknown customer fails fetch_customer and the execution", async () => {
   const submitted = await submitRequest({

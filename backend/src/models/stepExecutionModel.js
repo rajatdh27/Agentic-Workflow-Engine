@@ -82,9 +82,4 @@ async function listStepExecutions(executionId) {
   return rows;
 }
 
-module.exports.startOrRetryStep = startOrRetryStep;
-module.exports.markCompleted = markCompleted;
-module.exports.markFailed = markFailed;
-module.exports.markWaitingForApproval = markWaitingForApproval;
-module.exports.getStepExecution = getStepExecution;
-module.exports.listStepExecutions = listStepExecutions;
+module.exports = { startOrRetryStep, markCompleted, markFailed, markWaitingForApproval, getStepExecution, listStepExecutions };

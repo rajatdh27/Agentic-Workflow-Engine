@@ -4,34 +4,26 @@ const GeminiAgentClient = require("./GeminiAgentClient.js");
 const ClaudeAgentClient = require("./ClaudeAgentClient.js");
 const OpenAIAgentClient = require("./OpenAIAgentClient.js");
 
+const PROVIDERS = {
+  fake: () => new FakeAgentClient(),
+  gemini: () => new GeminiAgentClient({ apiKey: env.aiApiKey, model: env.aiModel }),
+  claude: () => new ClaudeAgentClient({ apiKey: env.aiApiKey, model: env.aiModel }),
+  openai: () => new OpenAIAgentClient({ apiKey: env.aiApiKey, model: env.aiModel }),
+};
+
 let client;
 
 function getAgentClient() {
   if (client) return client;
 
   const provider = env.aiProvider || "fake";
-
-  if (provider === "fake") {
-    client = new FakeAgentClient();
-    return client;
+  const factory = PROVIDERS[provider];
+  if (!factory) {
+    throw new Error(`AI provider "${provider}" is not implemented yet`);
   }
 
-  if (provider === "gemini") {
-    client = new GeminiAgentClient({ apiKey: env.aiApiKey, model: env.aiModel });
-    return client;
-  }
-
-  if (provider === "claude") {
-    client = new ClaudeAgentClient({ apiKey: env.aiApiKey, model: env.aiModel });
-    return client;
-  }
-
-  if (provider === "openai") {
-    client = new OpenAIAgentClient({ apiKey: env.aiApiKey, model: env.aiModel });
-    return client;
-  }
-
-  throw new Error(`AI provider "${provider}" is not implemented yet`);
+  client = factory();
+  return client;
 }
 
 function setAgentClient(newClient) {
